@@ -1,0 +1,41 @@
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
+metadata:
+  name: my-cluster2-tlsroute
+  namespace: kafka
+spec:
+  hostnames:
+  - my-cluster2-kafka-bootstrap.kafka
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: gateway
+    namespace: istio-ingress
+  rules:
+  - backendRefs:
+    - group: ""
+      kind: Service
+      name: my-cluster2-kafka-bootstrap
+      port: 9093
+      weight: 1
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
+metadata:
+  name: my-cluster2-broker-0-tlsroute
+  namespace: kafka
+spec:
+  hostnames:
+  - my-cluster2-kafka-0.kafka
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: gateway
+    namespace: istio-ingress
+  rules:
+  - backendRefs:
+    - group: ""
+      kind: Service
+      name: my-cluster2-kafka-brokers
+      port: 9093
+      weight: 1
