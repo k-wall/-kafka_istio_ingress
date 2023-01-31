@@ -24,6 +24,7 @@ kubectl create -f 'https://strimzi.io/install/latest?namespace=kafka' -n kafka
 ## Create Ingress Gateway
 
 ```
+kubectl create namespace istio-ingress
 kubectl apply -f gateway.yaml
 # Await ready
 watch kubectl get gateway gateway -n istio-ingress
