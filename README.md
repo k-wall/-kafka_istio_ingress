@@ -3,14 +3,17 @@
 ## Prequistes 
 
 1. Install istio locally (I'm using 1.16.2)
+2. Clone this repo and `cd` into it
 
 # Prepare cluster
 
 1. Using minikube
-1. Install Istio with the Gateway *v1alpha1-rc1* APIs using [these instructions](https://istio.io/latest/docs/tasks/traffic-management/ingress/gateway-api/):
+1. Install Istio with the Gateway APIs using [these instructions](https://istio.io/latest/docs/tasks/traffic-management/ingress/gateway-api/):
 ```
 kubectl get crd gateways.gateway.networking.k8s.io || \
-  { kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v1alpha1-rc1" | kubectl apply -f -; }
+  { kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.5.1" | kubectl apply -f -; }
+kubectl apply -f gatewayapi_alphas.yaml
+istioctl install --set profile=minimal -y
 ```  
 1. Install strimzi
 ```
@@ -22,6 +25,32 @@ kubectl create -f 'https://strimzi.io/install/latest?namespace=kafka' -n kafka
 
 
 ## Create Ingress Gateway
+
+```
+kubectl apply -f gateway.yaml
+# Await ready
+watch kubectl get gateway gateway -n istio-ingress
+```
+
+In another terminal start:
+```
+minikube tunnel
+```
+
+Wire up host side name resolution. This will allow the SNI names to resolve locally later.
+```
+INGRESS=$(kubectl get gateways gateway -n istio-ingress -ojsonpath='{.status.addresses[*].value}')
+echo $INGRESS # It will probably look like 10.96.33.216
+
+sudo sh -c 'cat >> /etc/hosts' << EOF
+# Kafka/Ingress Gateway experiment
+${INGRESS} my-cluster1-kafka-bootstrap.kafka my-cluster1-kafka-0.kafka my-cluster2-kafka-bootstrap.kafka my-cluster2-kafka-0.kafka
+EOF
+```
+
+
+
+
 
 ```
 apiVersion: gateway.networking.k8s.io/v1beta1
