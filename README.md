@@ -21,9 +21,6 @@ kubectl create namespace kafka
 kubectl create -f 'https://strimzi.io/install/latest?namespace=kafka' -n kafka
 ```
 
-
-
-
 ## Create Ingress Gateway
 
 ```
@@ -49,174 +46,70 @@ EOF
 ```
 
 
+## Create First Kafka Instance with its TLSRoutes and start producer/consumer
 
+The important part here is the overridden advertised host in the `my-cluster1-kafka.yaml`.
+
+```
+kubectl apply -f my-cluster1-kafka.yaml
+kubectl apply -f my-cluster1-tlsroutes.yaml
+kubectl wait kafka/my-cluster1 --for=condition=Ready --timeout=300s -n kafka 
+kubectl get secrets -n kafka  my-cluster1-cluster-ca-cert -o json | jq -r '.data."ca.crt" | @base64d '  >> /tmp/my-cluster1.crt
+```
+
+In separate windows, start publisher/consumer:
+
+```
+gtr -dc A-Za-z0-9 </dev/urandom | fold -10 |  kafka-console-producer  -bootstrap-server my-cluster1-kafka-bootstrap.kafka:8090 --topic foo --producer-property security.protocol=SSL --producer-property ssl.truststore.type=PEM --producer-property ssl.truststore.location=/tmp/my-cluster1.crt
+```
+
+```
+kafka-console-consumer  -bootstrap-server my-cluster1-kafka-bootstrap.kafka:8090 --topic foo -consumer-property security.protocol=SSL --consumer-property ssl.truststore.type=PEM --consumer-property ssl.truststore.location=/tmp/my-cluster1.crt
+
+```
+
+## Create Second Kafka Instance with its TLSRoutes 
 
 
 ```
-apiVersion: gateway.networking.k8s.io/v1beta1
-kind: Gateway
-metadata:
-  name: gateway
-  namespace: istio-ingress
-spec:
-  gatewayClassName: istio
-  listeners:
-  - allowedRoutes:
-      kinds:
-      - kind: TLSRoute
-        group: gateway.networking.k8s.io
-      namespaces:
-        from: All
-    name: mytcp
-    port: 8090
-    protocol: TLS
-    tls:
-      mode: Passthrough
-```
+kubectl apply -f my-cluster2-kafka.yaml
+kubectl apply -f my-cluster2-tlsroutes.yaml
+kubectl wait kafka/my-cluster2 --for=condition=Ready --timeout=300s -n kafka 
+kubectl get secrets -n kafka  my-cluster2-cluster-ca-cert -o json | jq -r '.data."ca.crt" | @base64d '  >> /tmp/my-cluster2.crt
 
-## Create Kafka Instance
 
-(Note: I've overridden the advertized host)
+# And show it is working by sending/receiving a message
+echo "hello" | kafka-console-producer  -bootstrap-server my-cluster2-kafka-bootstrap.kafka:8090 --topic foo --producer-property security.protocol=SSL --producer-property ssl.truststore.type=PEM --producer-property ssl.truststore.location=/tmp/my-cluster2.crt
+kafka-console-consumer  -bootstrap-server my-cluster2-kafka-bootstrap.kafka:8090 --topic foo -consumer-property security.protocol=SSL --consumer-property ssl.truststore.type=PEM --consumer-property ssl.truststore.location=/tmp/my-cluster2.crt --from-beginning
 
 ```
-apiVersion: kafka.strimzi.io/v1beta2
-kind: Kafka
-metadata:
-  name: my-cluster
-spec:
-  kafka:
-    config:
-      default.replication.factor: 1
-      inter.broker.protocol.version: "3.3"
-      min.insync.replicas: 1
-      offsets.topic.replication.factor: 1
-      transaction.state.log.min.isr: 1
-      transaction.state.log.replication.factor: 1
-    listeners:
-    - name: plain
-      port: 9092
-      tls: false
-      type: internal
-    - configuration:
-        brokers:
-        - advertisedHost: my-cluster-kafka-0.kafka
-          advertisedPort: 8090
-          broker: 0
-      name: tls
-      port: 9093
-      tls: true
-      type: internal
-    replicas: 1
-    storage:
-      type: jbod
-      volumes:
-      - deleteClaim: false
-        id: 0
-        size: 100Gi
-        type: persistent-claim
-    version: 3.3.2
-  zookeeper:
-    replicas: 1
-    storage:
-      deleteClaim: false
-      size: 100Gi
-      type: persistent-claim
+
+Notice that the 1st kafka instance is still happily producing/consumer.
+
+
+Now delete the 2nd instance
+
+```
+kubectl delete -f my-cluster2-kafka.yaml
+kubectl delete -f my-cluster2-tlsroutes.yaml
 ```
 
 
-## Create routes for bootstrap and broker-0
+Again 1st kafka instance still producing/consuming.
 
+# Useful commands
 
-```
-apiVersion: gateway.networking.k8s.io/v1alpha2
-kind: TLSRoute
-metadata:
-  name: my-cluster-tlsroute
-spec:
-  hostnames:
-  - my-cluster-kafka-bootstrap.kafka
-  parentRefs:
-  - group: gateway.networking.k8s.io
-    kind: Gateway
-    name: gateway
-    namespace: istio-ingress
-  rules:
-  - backendRefs:
-    - group: ""
-      kind: Service
-      name: my-cluster-kafka-bootstrap
-      port: 9093
-      weight: 1
-```
+## Using OpenSSL to verify that the SNI is working
 
-
-
+Check that the certificate chain presented belongs to the expected cluster.
 
 ```
-apiVersion: gateway.networking.k8s.io/v1alpha2
-kind: TLSRoute
-metadata:
-  name: my-cluster-broker-0-tlsroute.kafka
-spec:
-  hostnames:
-  - my-cluster-kafka-0
-  parentRefs:
-  - group: gateway.networking.k8s.io
-    kind: Gateway
-    name: gateway
-    namespace: istio-ingress
-  rules:
-  - backendRefs:
-    - group: ""
-      kind: Service
-      name: my-cluster-kafka-brokers
-      port: 9093
-      weight: 1
+/usr/local/opt/openssl@3/bin/openssl s_client -connect  my-cluster1-kafka-bootstrap.kafka:8090 -servername my-cluster1-kafka-bootstrap.kafka -showcerts -CAfile /tmp/my-cluster1.crt
 ```
 
-
-## Run a minikube tunnel
-
-```
- minikube tunnel
-```
-
-
-## Get the Ingress IP
-
-kubectl get gateways.gateway.networking.k8s.io gateway -n istio-ingress -ojsonpath='{.status.addresses[*].value}
-
-
-## Munge your /etc/hosts
-
-```
-10.108.173.216 my-cluster-kafka-bootstrap.kafka my-cluster-kafka-0.kafka my-cluster2-kafka-bootstrap.kafka my-cluster2-kafka-0.kafka
-```
-
-
-
-## Run a command like this:
-
-```
-oc get secrets -n kafka  my-cluster-cluster-ca-cert -o json | jq -r '.data."ca.crt" | @base64d '  >> /tmp/trust
-```
-
-Create a config file
-```
-security.protocol=SSL
-ssl.truststore.location=/tmp/trust
-ssl.truststore.type=PEM
-```
-
-
-```
- kafka-console-producer --producer.config ./config -bootstrap-server my-cluster-kafka-bootstrap:8090 --topic foo
+## Enabling Gateway Debug
  
- ```
- 
- ## Useful commands?
- 
- ```
- istioctl proxy-config log gateway-5b4469658b-qjgjz.istio-ingress --level debug
- ```
+```
+istioctl proxy-config log gateway-5b4469658b-qjgjz.istio-ingress --level debug
+```
  
