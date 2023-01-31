@@ -1,5 +1,11 @@
 # Strimzi/Kafka with Istio based Ingress
 
+## Prequistes 
+
+1. Install istio locally (I'm using 1.16.2)
+
+# Prepare cluster
+
 1. Using minikube
 1. Install Istio with the Gateway *v1alpha1-rc1* APIs using [these instructions](https://istio.io/latest/docs/tasks/traffic-management/ingress/gateway-api/):
 ```
@@ -7,6 +13,12 @@ kubectl get crd gateways.gateway.networking.k8s.io || \
   { kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v1alpha1-rc1" | kubectl apply -f -; }
 ```  
 1. Install strimzi
+```
+kubectl create namespace kafka
+kubectl create -f 'https://strimzi.io/install/latest?namespace=kafka' -n kafka
+```
+
+
 
 
 ## Create Ingress Gateway
