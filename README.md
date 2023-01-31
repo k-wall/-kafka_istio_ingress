@@ -1,8 +1,12 @@
 # Strimzi/Kafka with Istio based Ingress
 
 1. Using minikube
+1. Install Istio with the Gateway *v1alpha1-rc1* APIs using [these instructions](https://istio.io/latest/docs/tasks/traffic-management/ingress/gateway-api/):
+```
+kubectl get crd gateways.gateway.networking.k8s.io || \
+  { kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v1alpha1-rc1" | kubectl apply -f -; }
+```  
 1. Install strimzi
-1. Install istio
 
 
 ## Create Ingress Gateway
