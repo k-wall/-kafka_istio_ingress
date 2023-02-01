@@ -4,7 +4,7 @@
 
 * The [Gateway API](https://istio.io/latest/docs/tasks/traffic-management/ingress/gateway-api/) is configured to allow to SNI based routing.  Istio responds by creating a Envoy instance, wired to a Kubernetes service which is exposed by Minikube to the host.
 * The Kafka CR is configured to expose a internal TLS listener.  
-* Alongside each Kafka CR we create TLSRoute objects that permit traffic to be ingressed to the bootstrap and broker address.
+* Alongside each Kafka CR we create [TLSRoute](https://gateway-api.sigs.k8s.io/concepts/api-overview/#tlsroute) objects that permit traffic to be ingressed to the bootstrap and broker address.
 
 
 # Prequistes 
