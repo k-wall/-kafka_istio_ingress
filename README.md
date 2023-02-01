@@ -15,7 +15,7 @@
 # Prepare cluster
 
 1. Using minikube
-1. Install Istio with the Gateway APIs using [these instructions](https://istio.io/latest/docs/tasks/traffic-management/ingress/gateway-api/):
+1. Install Istio with the Gateway APIs using the instructions below.  These are adapted from [these instructions](https://istio.io/latest/docs/tasks/traffic-management/ingress/gateway-api/):
 ```
 kubectl get crd gateways.gateway.networking.k8s.io || \
   { kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.5.1" | kubectl apply -f -; }
