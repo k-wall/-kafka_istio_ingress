@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: TLSRoute
 metadata:
-  name: my-cluster2-tlsroute
+  name: my-cluster2-kafka-tls-bootstrap
   namespace: kafka
 spec:
   hostnames:
@@ -15,14 +15,14 @@ spec:
   - backendRefs:
     - group: ""
       kind: Service
-      name: my-cluster2-kafka-bootstrap
+      name: my-cluster2-kafka-tls-bootstrap
       port: 9093
       weight: 1
 ---
 apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: TLSRoute
 metadata:
-  name: my-cluster2-broker-0-tlsroute
+  name: my-cluster2-kafka-tls-0
   namespace: kafka
 spec:
   hostnames:
@@ -36,6 +36,6 @@ spec:
   - backendRefs:
     - group: ""
       kind: Service
-      name: my-cluster2-kafka-brokers
+      name: my-cluster2-kafka-tls-0
       port: 9093
       weight: 1
