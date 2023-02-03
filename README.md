@@ -120,4 +120,8 @@ Check that the certificate chain presented belongs to the expected cluster.
 ```
 istioctl proxy-config log gateway-5b4469658b-qjgjz.istio-ingress --level debug
 ```
- 
+
+Istio control plane logging
+```
+istioctl admin log  --level 'validationController:debug'
+```
