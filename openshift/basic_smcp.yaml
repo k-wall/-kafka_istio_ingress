@@ -32,3 +32,5 @@ spec:
     sampling: 10000
     type: Jaeger
   version: v2.3
+  techPreview:
+    controlPlaneMode: ClusterScoped
