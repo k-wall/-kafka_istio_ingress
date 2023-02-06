@@ -1,0 +1,42 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  name: my-cluster1
+  namespace: kafka
+spec:
+  kafka:
+    config:
+      default.replication.factor: 1
+      inter.broker.protocol.version: "3.3"
+      min.insync.replicas: 1
+      offsets.topic.replication.factor: 1
+      transaction.state.log.min.isr: 1
+      transaction.state.log.replication.factor: 1
+    listeners:
+    - configuration:
+        bootstrap:
+          alternativeNames:
+          - my-cluster1-kafka-bootstrap.kafka.kwall-kafka.ftm3.s1.devshift.org
+        brokers:
+        - advertisedHost: my-cluster1-kafka-0.kafka.kwall-kafka.ftm3.s1.devshift.org
+          advertisedPort: 443
+          broker: 0
+      name: tls
+      port: 9093
+      tls: true
+      type: cluster-ip
+    replicas: 1
+    storage:
+      type: jbod
+      volumes:
+      - deleteClaim: false
+        id: 0
+        size: 100Gi
+        type: persistent-claim
+    version: 3.3.2
+  zookeeper:
+    replicas: 1
+    storage:
+      deleteClaim: false
+      size: 100Gi
+      type: persistent-claim
