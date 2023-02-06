@@ -1,9 +1,9 @@
-# Strimzi/Kafka with Red Hat Service Mesh based Ingress (Open Shift)
+# Strimzi/Kafka with Red Hat Service Mesh based Ingress (OpenShift)
 
 # How's it work?
 
-* The [Gateway API](https://gateway-api.sigs.k8s.io/) is configured to allow to SNI based routing.  Istio responds by creating a Envoy instance, wired to a Kubernetes service which is exposed by Minikube to the host.
-* The Kafka CR is configured to expose `cluster-ip` TLS listeners, which provide 1 service per broker and 1 for bootstrap..
+* The [Gateway API](https://gateway-api.sigs.k8s.io/) is configured to allow to use SNI based routing (TLSRoute).  Istio responds by creating a Envoy instance, wired to a Kubernetes service which is exposed by using a External Load Balancer kube service.
+* The Kafka CR is configured to expose `cluster-ip` TLS listeners, which provide 1 service per broker and 1 for bootstrap.  The `advertisedHost` feature is used to get Kafka to adveritize broker addresses that are publicly accessible.
 * Alongside each Kafka CR we create [TLSRoute](https://gateway-api.sigs.k8s.io/concepts/api-overview/#tlsroute) objects (1 per service) that permit traffic to be ingressed to the bootstrap and broker address(es).
 
 
