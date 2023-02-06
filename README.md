@@ -12,7 +12,7 @@
 graph TD;
     Host-->MinikubeTunnel;
     MinikubeTunnel-->Istio-Gateway;
-    subgraph Minikube
+    subgraph Kubernetes
     Istio-Gateway-->Kafka_1_Bootstrap;
     Istio-Gateway-->Kafka_1_Broker_1;
     Istio-Gateway-->Kafka_1_Broker_n;
