@@ -6,7 +6,7 @@
 * The Kafka CR is configured using TLS listeners of type `cluster-ip`.  These provide 1 kubernetes service per broker and 1 for bootstrap.
 * The Strimzi `advertisedHost` feature is used to get Kafka to adveritize broker addresses that are publicly accessible.
 * Alongside each Kafka CR we create [TLSRoute](https://gateway-api.sigs.k8s.io/concepts/api-overview/#tlsroute) objects (1 per service) that permit traffic to be ingressed to the bootstrap and broker address(es).  It is the SNI based routing that ensures the traffic reaches the correct kafka cluster and the correct broker within the cluster.
-* Host file entries are used to create resolvable DNS names for kafka bootstrap and broker(s).
+* `/etc/host` file entries are used to create resolvable DNS names for kafka bootstrap and broker(s).
 
 ```mermaid
 graph TD;
