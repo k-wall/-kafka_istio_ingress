@@ -34,3 +34,5 @@ spec:
   version: v2.3
   techPreview:
     controlPlaneMode: ClusterScoped
+  security:
+    manageNetworkPolicy: false
