@@ -55,7 +55,7 @@ Test the names resolve on your local host:
 
 ```
 nslookup my-cluster1-kafka-bootstrap.kafka.${CLUSTER}
-nslookup my-cluster1-kafka-0..kafka.${CLUSTER}
+nslookup my-cluster1-kafka-0.kafka.${CLUSTER}
 ```
 
 ## Create Kafka  with corresponding TLSRoutes and start producer/consumer
