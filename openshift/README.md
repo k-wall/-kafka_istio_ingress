@@ -16,9 +16,9 @@
 # Prepare cluster
 
 1. I'm using OSD 4.12.0
-2. Install Red Hat Sevice Mesh as per https://docs.openshift.com/container-platform/4.12/service_mesh/v2x/installing-ossm.html
-3. Install the Gateway API CRDs as per https://docs.openshift.com/container-platform/4.12/service_mesh/v2x/servicemesh-release-notes.html#kubernetes-gateway-api
-4. Install strimzi
+1. Install the Gateway API CRDs as per https://docs.openshift.com/container-platform/4.12/service_mesh/v2x/servicemesh-release-notes.html#kubernetes-gateway-api
+1. Install Red Hat Sevice Mesh as per https://docs.openshift.com/container-platform/4.12/service_mesh/v2x/installing-ossm.html
+1. Install strimzi
 ```
 oc create namespace kafka
 oc create -f 'https://strimzi.io/install/latest?namespace=kafka' -n kafka
