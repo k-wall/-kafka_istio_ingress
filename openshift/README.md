@@ -46,7 +46,7 @@ echo ${CLUSTER}
 
 ## Configure Red Hat Service Mesh Control Plane
 
-``
+```
 oc new-project istio-system
 oc apply -f basic_smcp.yaml
 oc apply -f default_smmr.yaml
