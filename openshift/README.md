@@ -30,7 +30,7 @@ graph TD;
 # Prepare cluster
 
 1. I'm using OSD 4.12.0
-1. Install the Gateway API CRDs as per https://docs.openshift.com/container-platform/4.12/service_mesh/v2x/servicemesh-release-notes.html#kubernetes-gateway-api
+1. Install the Gateway API CRDs as per https://docs.openshift.com/container-platform/4.12/service_mesh/v2x/servicemesh-release-notes.html#kubernetes-gateway-api. Note this a *tech preview feature*.
 1. Install Red Hat Sevice Mesh as per https://docs.openshift.com/container-platform/4.12/service_mesh/v2x/installing-ossm.html
 1. Install strimzi
 ```
