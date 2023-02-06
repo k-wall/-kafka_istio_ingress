@@ -64,7 +64,7 @@ The important part here to note is that the domain names appearing in the advert
 SNI based matching in the `TLSRoutes`.
 
 ```
-CLUSTER=$CLUSTER envsubst | kubectl apply -f -
+CLUSTER=$CLUSTER envsubst < my-cluster1.yaml | kubectl apply -f -
 kubectl wait kafka/my-cluster1 --for=condition=Ready --timeout=300s -n kafka
 kubectl get secrets -n kafka  my-cluster1-cluster-ca-cert -o json | jq -r '.data."ca.crt" | @base64d '  >> /tmp/my-cluster1.crt
 ```
