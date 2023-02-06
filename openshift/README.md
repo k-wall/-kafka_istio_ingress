@@ -1,4 +1,4 @@
- Strimzi/Kafka with Istio based Ingress
+# Strimzi/Kafka with Red Hat Service Mesh based Ingress (Open Shift)
 
 # How's it work?
 
@@ -68,7 +68,6 @@ kubectl wait kafka/my-cluster1 --for=condition=Ready --timeout=300s -n kafka
 kubectl get secrets -n kafka  my-cluster1-cluster-ca-cert -o json | jq -r '.data."ca.crt" | @base64d '  >> /tmp/my-cluster1.crt
 ```
 
-
 And finally show it all works. In the first terminal run:
 
 
@@ -79,6 +78,5 @@ kafka-console-consumer  -bootstrap-server my-cluster1-kafka-bootstrap.kafka.${CL
 In the second run:
 ```
 echo "hello" | kafka-console-producer  -bootstrap-server my-cluster1-kafka-bootstrap.kafka.${CLUSTER}:443 --topic foo --producer-property security.protocol=SSL --producer-property ssl.truststore.type=PEM --producer-property ssl.truststore.location=/tmp/my-cluster1.crt
-
 ```
 
