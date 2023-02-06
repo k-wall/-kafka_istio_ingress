@@ -43,10 +43,19 @@ Get the cluster base dns name:
 CLUSTER=$(oc whoami --show-server | sed -e 's#https://api\.\(.*\):6443#\1#')
 echo ${CLUSTER}
 ```
+
+## Configure Red Hat Service Mesh Control Plane
+
+``
+oc new-project istio-system
+oc apply -f basic_smcp.yaml
+oc apply -f default_smmr.yaml
+```
+
 ## Create Ingress Gateway
 
 ```
-oc create namespace istio-ingress
+oc new-project  istio-ingress
 oc apply -f gateway.yaml
 # Await ready
 watch oc get gateway gateway -n istio-ingress
